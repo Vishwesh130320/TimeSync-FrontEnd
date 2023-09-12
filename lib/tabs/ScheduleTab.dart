@@ -320,10 +320,13 @@
 //   ));
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show showCupertinoModalPopup;
+
 
 class ScheduleTab extends StatefulWidget {
   const ScheduleTab({Key? key}) : super(key: key);
@@ -357,6 +360,8 @@ class _ScheduleTabState extends State<ScheduleTab> {
   Alignment _alignment = Alignment.centerLeft;
 
   List<ScheduleItem> schedules = [];
+  var format = new DateFormat.yMMMMEEEEd('en_US');
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -365,20 +370,22 @@ class _ScheduleTabState extends State<ScheduleTab> {
   }
 
   Future<void> fetchSchedules() async {
-    final response = await http.get(Uri.parse('http://localhost:8000/appointment'));
+    final response =
+        await http.get(Uri.parse('http://localhost:8000/appointment'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       setState(() {
         schedules = data.map((item) {
           return ScheduleItem(
-            id: item['_id'] ?? '', // Provide a default value if 'id' is null
+            id: item['_id'] ?? '',
+            // Provide a default value if 'id' is null
             doctorName: item['doctorName'] ?? '',
             doctorTitle: item['doctorTitle'] ?? '',
             reservedDate: item['appointmentDate'] ?? '',
             time: item['appointmentTime'] ?? '',
             status: FilterStatus.values.firstWhere(
-                  (e) => e.toString().split('.')[1] == (item['status'] ?? ''),
+              (e) => e.toString().split('.')[1] == (item['status'] ?? ''),
               orElse: () => FilterStatus.Upcoming,
             ),
           );
@@ -389,12 +396,12 @@ class _ScheduleTabState extends State<ScheduleTab> {
     }
   }
 
-
   Future<void> cancelAppointment(String id) async {
     print("object111 $id");
     try {
       final response = await http.put(
-        Uri.parse('http://localhost:8000/appointment/$id'), // Use the correct cancel endpoint
+        Uri.parse('http://localhost:8000/appointment/$id'),
+        // Use the correct cancel endpoint
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -404,10 +411,38 @@ class _ScheduleTabState extends State<ScheduleTab> {
       if (response.statusCode == 200) {
         // If the cancellation is successful, update the local status
         setState(() {
-          final appointment = schedules.firstWhere((element) => element.id == id);
+          final appointment =
+              schedules.firstWhere((element) => element.id == id);
           appointment.status = FilterStatus.Canceled;
         });
         print("Successfully deleted $id");
+      } else {
+        throw Exception('Failed to cancel appointment ');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+  Future<void> rescheduleAppointment(String id,String date) async {
+    print("date111 $date");
+    try {
+      final response = await http.put(
+        Uri.parse('http://localhost:8000/appointment/$id'),
+        // Use the correct cancel endpoint
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'appointmentDate': '$date'}), // Send the updated status
+      );
+
+      if (response.statusCode == 200) {
+        // If the cancellation is successful, update the local status
+        setState(() {
+          final appointment =
+          schedules.firstWhere((element) => element.id == id);
+          appointment.status = FilterStatus.Canceled;
+        });
+        print("Successfully updated $date");
       } else {
         throw Exception('Failed to cancel appointment ');
       }
@@ -421,7 +456,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
     List<ScheduleItem> filteredSchedules = schedules.where((schedule) {
       return schedule.status == status;
     }).toList();
-
+    // var dateString = format.format(_schedule.reservedDate);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 30, top: 30, right: 30),
@@ -459,9 +494,11 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                 status = filterStatus;
                                 if (filterStatus == FilterStatus.Upcoming) {
                                   _alignment = Alignment.centerLeft;
-                                } else if (filterStatus == FilterStatus.Completed) {
+                                } else if (filterStatus ==
+                                    FilterStatus.Completed) {
                                   _alignment = Alignment.center;
-                                } else if (filterStatus == FilterStatus.Canceled) {
+                                } else if (filterStatus ==
+                                    FilterStatus.Canceled) {
                                   _alignment = Alignment.centerRight;
                                 }
                               });
@@ -524,7 +561,8 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage: AssetImage('assets/doctor.jpg'), // Replace with your default image
+                                backgroundImage: AssetImage(
+                                    'assets/doctor.jpg'), // Replace with your default image
                               ),
                               SizedBox(
                                 width: 10,
@@ -558,35 +596,46 @@ class _ScheduleTabState extends State<ScheduleTab> {
                             height: 15,
                           ),
                           DateTimeCard(
-                            date: _schedule.reservedDate,
+                            date: format.format(DateTime.parse(_schedule
+                                .reservedDate)) /*_schedule.reservedDate*/,
                             time: _schedule.time,
                           ),
                           SizedBox(
                             height: 15,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    // Call the cancelAppointment function with the appointment's ID
-                                    cancelAppointment(_schedule.id);
-                                  },
-                                ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Expanded(
-                                child: ElevatedButton(
-                                  child: Text('Reschedule'),
-                                  onPressed: () => {},
-                                ),
-                              ),
-                            ],
-                          )
+                          status == FilterStatus.Upcoming
+                              ? Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          // Call the cancelAppointment function with the appointment's ID
+                                          cancelAppointment(_schedule.id);
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        child: Text('Reschedule'),
+                                        onPressed: () => {
+                                        showCupertinoModalPopup<void>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                        return _buildCupertinoDatePicker(_schedule.id);
+                                        },
+                                        )
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Container()
                         ],
                       ),
                     ),
@@ -596,6 +645,35 @@ class _ScheduleTabState extends State<ScheduleTab> {
             ),
           ],
         ),
+      ),
+    );
+  }
+  Widget _buildCupertinoDatePicker(String id) {
+    return Container(
+      height: 500,
+      child: Column(
+        children: [
+          Container(
+            height: 200,
+            child: CupertinoDatePicker(
+
+              mode: CupertinoDatePickerMode.dateAndTime,
+              initialDateTime: _selectedDate,
+              onDateTimeChanged: (DateTime newDate) {
+                setState(() {
+                  _selectedDate = newDate;
+                });
+              },
+            ),
+          ),
+          ElevatedButton(
+            child: Text('Reschedule'),
+            onPressed: () => {
+              rescheduleAppointment(id,_selectedDate.toString()),
+              Navigator.pop(context)
+            },
+          ),
+        ],
       ),
     );
   }
@@ -672,8 +750,5 @@ class DateTimeCard extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: ScheduleTab(),
-  ));
-}
+
+
