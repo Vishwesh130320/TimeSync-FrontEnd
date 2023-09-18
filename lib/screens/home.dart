@@ -22,6 +22,11 @@ class _HomeState extends State<Home> {
       _selectedIndex = 1;
     });
   }
+  @override
+  void initState() {
+    super.initState();
+    // fetchUserDetails();
+  }
 
   @override
   Widget build(BuildContext context) {

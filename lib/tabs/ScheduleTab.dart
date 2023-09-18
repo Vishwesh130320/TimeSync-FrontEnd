@@ -371,16 +371,21 @@ class _ScheduleTabState extends State<ScheduleTab> {
 
   Future<void> fetchSchedules() async {
     final response =
-        await http.get(Uri.parse('http://localhost:8000/appointment'));
+        await http.get(Uri.parse('http://localhost:8000/appointment/get'), headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
+        });
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
+      print(data);
       setState(() {
         schedules = data.map((item) {
           return ScheduleItem(
             id: item['_id'] ?? '',
             // Provide a default value if 'id' is null
-            doctorName: item['doctorName'] ?? '',
+            doctorName: item['doctorId']['username'] ?? '',
             doctorTitle: item['doctorTitle'] ?? '',
             reservedDate: item['appointmentDate'] ?? '',
             time: item['appointmentTime'] ?? '',
