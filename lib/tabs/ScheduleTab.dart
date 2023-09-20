@@ -1,332 +1,10 @@
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-//
-// class ScheduleTab extends StatefulWidget {
-//   const ScheduleTab({Key? key}) : super(key: key);
-//
-//   @override
-//   State<ScheduleTab> createState() => _ScheduleTabState();
-// }
-//
-// enum FilterStatus { Upcoming, Completed, Canceled }
-//
-// class ScheduleItem {
-//   final String doctorName;
-//   final String doctorTitle;
-//   final String reservedDate;
-//   final String time;
-//   final FilterStatus status;
-//
-//   ScheduleItem({
-//     required this.doctorName,
-//     required this.doctorTitle,
-//     required this.reservedDate,
-//     required this.time,
-//     required this.status,
-//   });
-// }
-//
-// class _ScheduleTabState extends State<ScheduleTab> {
-//   FilterStatus status = FilterStatus.Upcoming;
-//   Alignment _alignment = Alignment.centerLeft;
-//
-//   List<ScheduleItem> schedules = [];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchSchedules();
-//   }
-//
-//   Future<void> fetchSchedules() async {
-//     final response = await http.get(Uri.parse('http://localhost:8000/appointment'));
-//
-//     if (response.statusCode == 200) {
-//       final List<dynamic> data = json.decode(response.body);
-//       setState(() {
-//         schedules = data.map((item) {
-//           return ScheduleItem(
-//             doctorName: item['doctorName'] ?? '',
-//             doctorTitle: item['doctorTitle'] ?? '',
-//             reservedDate: item['appointmentDate'] ?? '',
-//             time: item['appointmentTime'] ?? '',
-//             status: FilterStatus.values.firstWhere(
-//                   (e) => e.toString().split('.')[1] == (item['status'] ?? ''),
-//               orElse: () => FilterStatus.Upcoming,
-//             ),
-//           );
-//         }).toList();
-//       });
-//     } else {
-//       throw Exception('Failed to load schedules');
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     List<ScheduleItem> filteredSchedules = schedules.where((schedule) {
-//       return schedule.status == status;
-//     }).toList();
-//
-//     return Scaffold(
-//       body: Padding(
-//         padding: const EdgeInsets.only(left: 30, top: 30, right: 30),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.stretch,
-//           children: [
-//             Text(
-//               'Schedule',
-//               textAlign: TextAlign.center,
-//               style: TextStyle(
-//                 fontSize: 24,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(
-//               height: 20,
-//             ),
-//             Stack(
-//               children: [
-//                 Container(
-//                   width: double.infinity,
-//                   height: 40,
-//                   decoration: BoxDecoration(
-//                     color: Colors.blueGrey,
-//                     borderRadius: BorderRadius.circular(20),
-//                   ),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       for (FilterStatus filterStatus in FilterStatus.values)
-//                         Expanded(
-//                           child: GestureDetector(
-//                             onTap: () {
-//                               setState(() {
-//                                 status = filterStatus;
-//                                 if (filterStatus == FilterStatus.Upcoming) {
-//                                   _alignment = Alignment.centerLeft;
-//                                 } else if (filterStatus == FilterStatus.Completed) {
-//                                   _alignment = Alignment.center;
-//                                 } else if (filterStatus == FilterStatus.Canceled) {
-//                                   _alignment = Alignment.centerRight;
-//                                 }
-//                               });
-//                             },
-//                             child: Center(
-//                               child: Text(
-//                                 filterStatus.toString().split('.').last,
-//                                 style: TextStyle(
-//                                   color: Colors.white,
-//                                   fontWeight: FontWeight.bold,
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                     ],
-//                   ),
-//                 ),
-//                 AnimatedAlign(
-//                   duration: Duration(milliseconds: 200),
-//                   alignment: _alignment,
-//                   child: Container(
-//                     width: 100,
-//                     height: 40,
-//                     decoration: BoxDecoration(
-//                       color: Colors.blue,
-//                       borderRadius: BorderRadius.circular(20),
-//                     ),
-//                     child: Center(
-//                       child: Text(
-//                         status.toString().split('.').last,
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 )
-//               ],
-//             ),
-//             SizedBox(
-//               height: 20,
-//             ),
-//             Expanded(
-//               child: ListView.builder(
-//                 itemCount: filteredSchedules.length,
-//                 itemBuilder: (context, index) {
-//                   var _schedule = filteredSchedules[index];
-//                   bool isLastElement = filteredSchedules.length == index + 1;
-//                   return Card(
-//                     margin: !isLastElement
-//                         ? EdgeInsets.only(bottom: 20)
-//                         : EdgeInsets.zero,
-//                     child: Padding(
-//                       padding: EdgeInsets.all(15),
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.stretch,
-//                         children: [
-//                           Row(
-//                             children: [
-//                               CircleAvatar(
-//                                 backgroundImage: AssetImage('assets/doctor.jpg'), // Replace with your default image
-//                               ),
-//                               SizedBox(
-//                                 width: 10,
-//                               ),
-//                               Column(
-//                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                 children: [
-//                                   Text(
-//                                     _schedule.doctorName,
-//                                     style: TextStyle(
-//                                       color: Colors.black,
-//                                       fontWeight: FontWeight.w700,
-//                                     ),
-//                                   ),
-//                                   SizedBox(
-//                                     height: 5,
-//                                   ),
-//                                   Text(
-//                                     _schedule.doctorTitle,
-//                                     style: TextStyle(
-//                                       color: Colors.grey,
-//                                       fontSize: 12,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ],
-//                           ),
-//                           SizedBox(
-//                             height: 15,
-//                           ),
-//                           DateTimeCard(
-//                             date: _schedule.reservedDate,
-//                             time: _schedule.time,
-//                           ),
-//                           SizedBox(
-//                             height: 15,
-//                           ),
-//                           Row(
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             children: [
-//                               Expanded(
-//                                 child: OutlinedButton(
-//                                   child: Text('Cancel'),
-//                                   onPressed: () {},
-//                                 ),
-//                               ),
-//                               SizedBox(
-//                                 width: 20,
-//                               ),
-//                               Expanded(
-//                                 child: ElevatedButton(
-//                                   child: Text('Reschedule'),
-//                                   onPressed: () => {},
-//                                 ),
-//                               ),
-//                             ],
-//                           )
-//                         ],
-//                       ),
-//                     ),
-//                   );
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-//
-// class DateTimeCard extends StatelessWidget {
-//   final String date;
-//   final String time;
-//
-//   DateTimeCard({
-//     required this.date,
-//     required this.time,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: Colors.grey[200], // Replace with your desired color
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       width: double.infinity,
-//       padding: EdgeInsets.all(20),
-//       child: Row(
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Row(
-//             children: [
-//               Icon(
-//                 Icons.calendar_today,
-//                 color: Colors.blue, // Replace with your desired color
-//                 size: 15,
-//               ),
-//               SizedBox(
-//                 width: 5,
-//               ),
-//               Text(
-//                 date,
-//                 style: TextStyle(
-//                   fontSize: 12,
-//                   color: Colors.blue, // Replace with your desired color
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ],
-//           ),
-//           Row(
-//             children: [
-//               Icon(
-//                 Icons.access_alarm,
-//                 color: Colors.blue, // Replace with your desired color
-//                 size: 17,
-//               ),
-//               SizedBox(
-//                 width: 5,
-//               ),
-//               Text(
-//                 time,
-//                 style: TextStyle(
-//                   fontSize: 12,
-//                   color: Colors.blue, // Replace with your desired color
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-//
-//
-// void main() {
-//   runApp(MaterialApp(
-//     home: ScheduleTab(),
-//   ));
-// }
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show showCupertinoModalPopup;
-
+import 'package:medicare/styles/colors.dart';
 
 class ScheduleTab extends StatefulWidget {
   const ScheduleTab({Key? key}) : super(key: key);
@@ -374,18 +52,17 @@ class _ScheduleTabState extends State<ScheduleTab> {
         await http.get(Uri.parse('http://localhost:8000/appointment/get'), headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         });
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      print(data);
       setState(() {
         schedules = data.map((item) {
           return ScheduleItem(
             id: item['_id'] ?? '',
             // Provide a default value if 'id' is null
-            doctorName: item['doctorId']['username'] ?? '',
+            doctorName: item['doctorName'] ?? '',
             doctorTitle: item['doctorTitle'] ?? '',
             reservedDate: item['appointmentDate'] ?? '',
             time: item['appointmentTime'] ?? '',
@@ -405,10 +82,11 @@ class _ScheduleTabState extends State<ScheduleTab> {
     print("object111 $id");
     try {
       final response = await http.put(
-        Uri.parse('http://localhost:8000/appointment/$id'),
+        Uri.parse('http://localhost:8000/appointment/cancel/$id'),
         // Use the correct cancel endpoint
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         },
         body: jsonEncode({'status': 'Canceled'}), // Send the updated status
       );
@@ -432,20 +110,25 @@ class _ScheduleTabState extends State<ScheduleTab> {
     print("date111 $date");
     try {
       final response = await http.put(
-        Uri.parse('http://localhost:8000/appointment/$id'),
-        // Use the correct cancel endpoint
+        Uri.parse('http://localhost:8000/appointment/reschedule/$id'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         },
         body: jsonEncode({'appointmentDate': '$date'}), // Send the updated status
       );
 
       if (response.statusCode == 200) {
         // If the cancellation is successful, update the local status
+
+
         setState(() {
-          final appointment =
+          var appointment =
           schedules.firstWhere((element) => element.id == id);
-          appointment.status = FilterStatus.Canceled;
+          appointment = new ScheduleItem(id: appointment.id, doctorName: appointment.doctorName, doctorTitle: appointment.doctorTitle, reservedDate: date, time: appointment.time, status: FilterStatus.values.firstWhere(
+                (e) => e.toString().split('.')[1] == ("Scheduled" ?? ''),
+            orElse: () => FilterStatus.Upcoming,
+          ));
         });
         print("Successfully updated $date");
       } else {
@@ -588,7 +271,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                   Text(
                                     _schedule.doctorTitle,
                                     style: TextStyle(
-                                      color: Colors.grey,
+                                      color: Colors.lightBlueAccent,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -695,12 +378,9 @@ class DateTimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var tag = Localizations.maybeLocaleOf(context)?.toLanguageTag();
-    //
-    // var date1 = DateFormat.yMMMd(tag).format(date); // Dec 31, 2000
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200], // Replace with your desired color
+        color: Color(MyColors.bg01),
         borderRadius: BorderRadius.circular(10),
       ),
       width: double.infinity,
@@ -713,8 +393,8 @@ class DateTimeCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.calendar_today,
-                color: Colors.blue, // Replace with your desired color
-                size: 15,
+                color: Colors.white, // Replace with your desired color
+                size: 17,
               ),
               SizedBox(
                 width: 5,
@@ -723,7 +403,7 @@ class DateTimeCard extends StatelessWidget {
                 date,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.blue, // Replace with your desired color
+                  color: Colors.white, // Replace with your desired color
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -733,7 +413,7 @@ class DateTimeCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.access_alarm,
-                color: Colors.blue, // Replace with your desired color
+                color: Colors.white, // Replace with your desired color
                 size: 17,
               ),
               SizedBox(
@@ -753,6 +433,52 @@ class DateTimeCard extends StatelessWidget {
       ),
     );
   }
+
+  // Widget build(BuildContext context) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Color(MyColors.bg01),
+  //       borderRadius: BorderRadius.circular(10),
+  //     ),
+  //     width: double.infinity,
+  //     padding: EdgeInsets.all(20),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: const [
+  //         Icon(
+  //           Icons.calendar_today,
+  //           color: Colors.white,
+  //           size: 17,
+  //         ),
+  //         SizedBox(
+  //           width: 5,
+  //         ),
+  //         Text(
+  //           'Mon, July 29',
+  //           style: TextStyle(color: Colors.white),
+  //         ),
+  //         SizedBox(
+  //           width: 20,
+  //         ),
+  //         Icon(
+  //           Icons.access_alarm,
+  //           color: Colors.white,
+  //           size: 17,
+  //         ),
+  //         SizedBox(
+  //           width: 5,
+  //         ),
+  //         Flexible(
+  //           child: Text(
+  //             date,
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
 }
 
 

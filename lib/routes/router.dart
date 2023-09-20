@@ -4,7 +4,7 @@ import 'package:medicare/screens/home.dart';
 import 'package:medicare/screens/login.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
-  '/': (context) => Home(),
+  '/home': (context) => Home(),
   '/detail': (context) => SliverDoctorDetail(),
   '/login': (context) => MyStatefulWidget(),
 

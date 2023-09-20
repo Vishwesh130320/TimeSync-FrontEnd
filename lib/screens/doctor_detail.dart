@@ -3,9 +3,63 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:medicare/styles/colors.dart';
 import 'package:medicare/styles/styles.dart';
 import "package:latlong2/latlong.dart" as latLng;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show showCupertinoModalPopup;
 
-class SliverDoctorDetail extends StatelessWidget {
+class SliverDoctorDetail extends StatefulWidget {
   const SliverDoctorDetail({Key? key}) : super(key: key);
+
+  @override
+  _SliverDoctorDetailState createState() => _SliverDoctorDetailState();
+}
+
+class _SliverDoctorDetailState extends State<SliverDoctorDetail> {
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+  DateTime selectedDate1 = DateTime.now();
+
+  _selectDate()  {
+
+    // final DateTime? pickedDate = await
+    // showDatePicker(
+    //   context: context,
+    //   initialDate: DateTime.now(),
+    //   firstDate: DateTime.now(),
+    //   lastDate: DateTime(DateTime.now().year + 1),
+    //     keyboardType : TextInputType.datetime
+    // );
+
+    // if (pickedDate != null && pickedDate != selectedDate) {
+    //   setState(() {
+    //     selectedDate1 = newDate;
+    //   });
+    // }
+  }
+
+  Future<void> _selectTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null && pickedTime != selectedTime) {
+      setState(() {
+        selectedTime = pickedTime;
+      });
+    }
+  }
+
+  Future<void> _bookAppointment() async {
+    if (selectedDate != null && selectedTime != null) {
+      print("selectedDate $selectedDate");
+      print("selectedTime $selectedTime");
+    } else {
+      // Handle the case when date or time is not selected
+      print('Date and time not selected.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +79,12 @@ class SliverDoctorDetail extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: DetailBody(),
+            child: DetailBody(
+              selectDate: _selectDate,
+              selectTime: _selectTime,
+              bookAppointment: _bookAppointment,
+              selectedDate1: selectedDate1,
+            ),
           )
         ],
       ),
@@ -33,13 +92,164 @@ class SliverDoctorDetail extends StatelessWidget {
   }
 }
 
-class DetailBody extends StatelessWidget {
+// class DetailBody extends StatelessWidget {
+//   final VoidCallback selectDate;
+//   final VoidCallback selectTime;
+//   final VoidCallback bookAppointment;
+//   final DateTime selectedDate1;
+//
+//   const DetailBody({
+//     Key? key,
+//     required this.selectDate,
+//     required this.selectTime,
+//     required this.bookAppointment,
+//     required this.selectedDate1,
+//   }) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: EdgeInsets.all(20),
+//       margin: EdgeInsets.only(bottom: 30),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.stretch,
+//         children: [
+//           DetailDoctorCard(),
+//           SizedBox(
+//             height: 15,
+//           ),
+//           DoctorInfo(),
+//           SizedBox(
+//             height: 30,
+//           ),
+//           Text(
+//             'About Doctor',
+//             style: kTitleStyle,
+//           ),
+//           SizedBox(
+//             height: 15,
+//           ),
+//           Text(
+//             'Dr. Joshua Simorangkir is a specialist in internal medicine who specialized blah blah.',
+//             style: TextStyle(
+//               color: Color(MyColors.purple01),
+//               fontWeight: FontWeight.w500,
+//               height: 1.5,
+//             ),
+//           ),
+//           SizedBox(
+//             height: 25,
+//           ),
+//           Text(
+//             'Location',
+//             style: kTitleStyle,
+//           ),
+//           SizedBox(
+//             height: 25,
+//           ),
+//           DoctorLocation(),
+//           SizedBox(
+//             height: 25,
+//           ),
+//           ElevatedButton(
+//             style: ButtonStyle(
+//               backgroundColor: MaterialStateProperty.all<Color>(
+//                 Color(MyColors.primary),
+//               ),
+//             ),
+//             child: Text('Book Appointment'),
+//             onPressed: ()  {
+//               print("Date is :"+selectedDate1.toString());
+//               CupertinoDatePicker(
+//                 mode: CupertinoDatePickerMode.dateAndTime,
+//                 initialDateTime: selectedDate1,
+//                 onDateTimeChanged: (DateTime newDate) async  {
+//                   selectedDate1;
+//                   //selectedDate1 = newDate;
+//                 },
+//               );
+//               // selectDate(); // Show date picker
+//               // selectTime(); // Show time picker
+//               // bookAppointment(); // Book the appointment
+//             },
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+class DetailBody extends StatefulWidget {
+  final VoidCallback selectDate;
+  final VoidCallback selectTime;
+  final VoidCallback bookAppointment;
+  final DateTime selectedDate1;
+
   const DetailBody({
     Key? key,
+    required this.selectDate,
+    required this.selectTime,
+    required this.bookAppointment,
+    required this.selectedDate1,
   }) : super(key: key);
 
   @override
+  _DetailBodyState createState() => _DetailBodyState();
+}
+
+class _DetailBodyState extends State<DetailBody> {
+  late DateTime selectedDate1;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate1 = widget.selectedDate1;
+  }
+
+  void _updateSelectedDate(DateTime newDate) {
+    setState(() {
+      selectedDate1 = newDate;
+    });
+  }
+
+  Future<void> createAppointment(DateTime date, String doctorId) async {
+    print("date111 $date");
+    print("doctorId $doctorId");
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8000/appointment/create'),
+        // Use the correct cancel endpoint
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
+        },
+        body: jsonEncode({
+          "doctorId": doctorId,
+          "patientId": "6503ea68024b71255ed46420",
+          "appointmentDate": '${date.toIso8601String}',
+          "durationInMinutes": 60,
+          "status": "Scheduled",
+          "location": "123 Main St",
+          "notes": "Follow-up appointment"
+        }), // Send the updated status
+      );
+
+      if (response.statusCode == 201) {
+        // If the cancellation is successful, update the local status
+
+        print("Successfully created for $date");
+      } else {
+        throw Exception('Failed to create appointment ');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print("context ${ModalRoute.of(context)!.settings.arguments}");
+    final String? doctorId = ModalRoute.of(context)!.settings.arguments as String?;
     return Container(
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.only(bottom: 30),
@@ -62,7 +272,7 @@ class DetailBody extends StatelessWidget {
             height: 15,
           ),
           Text(
-            'Dr. Joshua Simorangkir is a specialist in internal medicine who specialzed blah blah.',
+            'Dr. Joshua Simorangkir is a specialist in internal medicine who specialized blah blah.',
             style: TextStyle(
               color: Color(MyColors.purple01),
               fontWeight: FontWeight.w500,
@@ -90,13 +300,53 @@ class DetailBody extends StatelessWidget {
               ),
             ),
             child: Text('Book Appointment'),
-            onPressed: () => {},
+            onPressed: () async {
+              final DateTime newDate1 = await showCupertinoModalPopup(
+                context: context,
+                builder: (BuildContext context) {
+                  DateTime selectedDate = selectedDate1;
+                  return Container(
+                    color: Colors.blueAccent,
+                      height: MediaQuery.sizeOf(context).height*.35,
+                      child:
+                    Column(
+                      children: [
+                    Container(
+                      height: MediaQuery.sizeOf(context).height*.25,
+
+                      child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.dateAndTime,
+                          initialDateTime: selectedDate1,
+                          onDateTimeChanged: (DateTime newDate) {
+                            selectedDate = newDate;
+                          },
+                        ),),
+                        ElevatedButton(
+
+                          child: Text('Confirm appointment'),
+                          onPressed: () => {
+                            print("selectedDateselectedDateselectedDateselectedDate $selectedDate"),
+                            createAppointment(selectedDate, doctorId == null ? "" : doctorId),
+                            Navigator.pop(context)
+                          },
+                        )
+                      ],
+                    )
+                  );
+                },
+              );
+
+              // if (newDate != null) {
+              //   _updateSelectedDate(newDate);
+              // }
+            },
           )
         ],
       ),
     );
   }
 }
+
 
 class DoctorLocation extends StatelessWidget {
   const DoctorLocation({
@@ -152,21 +402,6 @@ class DoctorInfo extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class AboutDoctor extends StatelessWidget {
-  final String title;
-  final String desc;
-  const AboutDoctor({
-    Key? key,
-    required this.title,
-    required this.desc,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
 

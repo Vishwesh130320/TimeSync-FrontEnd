@@ -1,40 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:medicare/styles/colors.dart';
 import 'package:medicare/styles/styles.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:medicare/Model/doctorlist.dart';
 
-List<Map> doctors = [
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Gardner Pearson',
-    'doctorTitle': 'Heart Specialist'
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rosa Williamson',
-    'doctorTitle': 'Skin Specialist'
-  },
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Gardner Pearson',
-    'doctorTitle': 'Heart Specialist'
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rosa Williamson',
-    'doctorTitle': 'Skin Specialist'
-  }
-];
 
 class HomeTab extends StatelessWidget {
   final void Function() onPressedScheduleCard;
-
+  final List<DoctorList> doctorsList;
+  // final String userName;
   const HomeTab({
     Key? key,
     required this.onPressedScheduleCard,
+    required this.doctorsList,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print("doctorsList $doctorsList");
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
@@ -94,11 +78,16 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            for (var doctor in doctors)
+            for (DoctorList doctor in doctorsList)
               TopDoctorCard(
-                img: doctor['img'],
-                doctorName: doctor['doctorName'],
-                doctorTitle: doctor['doctorTitle'],
+                img:'assets/doctor03.jpeg',
+                doctorName: doctor == null ? 'Name' : doctor.username.toString(),
+                doctorTitle:doctor == null ? 'Doctor' :doctor.email.toString(),
+                doctorId: doctor == null ? '' : doctor.id.toString(),
+
+                onTap: () {
+                  Navigator.pushNamed(context, '/detail', arguments: doctor.id.toString());
+                },
               )
           ],
         ),
@@ -111,11 +100,15 @@ class TopDoctorCard extends StatelessWidget {
   String img;
   String doctorName;
   String doctorTitle;
+  final VoidCallback onTap;
+  final String doctorId;
 
   TopDoctorCard({
     required this.img,
     required this.doctorName,
     required this.doctorTitle,
+    required this.onTap,
+    required this.doctorId
   });
 
   @override
@@ -450,10 +443,112 @@ class SearchInput extends StatelessWidget {
   }
 }
 
-class UserIntro extends StatelessWidget {
-  const UserIntro({
-    Key? key,
-  }) : super(key: key);
+// class UserIntro extends StatelessWidget {
+//   const UserIntro({
+//     Key? key,
+//   }) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//       children: [
+//         Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: const [
+//             Text(
+//               'Hello',
+//               style: TextStyle(fontWeight: FontWeight.w500),
+//             ),
+//             Text(
+//               'Brad King 👋',
+//               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+//             ),
+//           ],
+//         ),
+//         const CircleAvatar(
+//           backgroundImage: AssetImage('assets/person.jpeg'),
+//         )
+//       ],
+//     );
+//   }
+// }
+
+class UserIntro extends StatefulWidget {
+  const UserIntro({Key? key}) : super(key: key);
+
+  @override
+  _UserIntroState createState() => _UserIntroState();
+}
+
+class _UserIntroState extends State<UserIntro> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+    // fetchAllDoctors();
+  }
+
+  // Function to fetch user profile data
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:8000/profile'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        final userProfile = json.decode(response.body);
+        final userFullName = userProfile['username']; // Assuming the API response has a 'username' field
+        setState(() {
+          userName = userFullName.toString();
+        });
+      } else {
+        print('Failed to fetch user profile');
+      }
+    } catch (error) {
+      // Handle network errors or other exceptions...
+      print('Error: $error');
+    }
+  }
+
+  // Function to fetch user profile data
+/*
+  Future<void> fetchAllDoctors() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:8000/doctors'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
+        setState(() {
+           userDataList = (json.decode(response.body))
+              .map((data) => {
+            "username": data["username"],
+            "email": data["email"],
+          })
+              .toList();
+        });
+      } else {
+        print('Failed to fetch user profile');
+      }
+    } catch (error) {
+      // Handle network errors or other exceptions...
+      print('Error: $error');
+    }
+  }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -462,13 +557,13 @@ class UserIntro extends StatelessWidget {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Hello',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             Text(
-              'Brad King 👋',
+              '$userName 👋', // Display the fetched user name
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ],
