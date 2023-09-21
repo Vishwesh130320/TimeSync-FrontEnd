@@ -212,9 +212,7 @@ class _DetailBodyState extends State<DetailBody> {
     });
   }
 
-  Future<void> createAppointment(DateTime date, String doctorId) async {
-    print("date111 $date");
-    print("doctorId $doctorId");
+  Future<void> createAppointment(DateTime date, String? doctorId, String? patientId) async {
     try {
       final response = await http.post(
         Uri.parse('http://localhost:8000/appointment/create'),
@@ -225,8 +223,8 @@ class _DetailBodyState extends State<DetailBody> {
         },
         body: jsonEncode({
           "doctorId": doctorId,
-          "patientId": "6503ea68024b71255ed46420",
-          "appointmentDate": '${date.toIso8601String}',
+          "patientId": patientId,
+          "appointmentDate": date.toUtc().toString(),
           "durationInMinutes": 60,
           "status": "Scheduled",
           "location": "123 Main St",
@@ -248,8 +246,12 @@ class _DetailBodyState extends State<DetailBody> {
 
   @override
   Widget build(BuildContext context) {
-    print("context ${ModalRoute.of(context)!.settings.arguments}");
-    final String? doctorId = ModalRoute.of(context)!.settings.arguments as String?;
+    final Map<String, dynamic> map = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+    String? doctorId = map['doctorId'];
+    String? patientId = map['patientId'];
+    print('doctor and patient in doctor_details $doctorId $patientId');
+
     return Container(
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.only(bottom: 30),
@@ -307,12 +309,12 @@ class _DetailBodyState extends State<DetailBody> {
                   DateTime selectedDate = selectedDate1;
                   return Container(
                     color: Colors.blueAccent,
-                      height: MediaQuery.sizeOf(context).height*.35,
+                      height: MediaQuery.of(context).size.height*.35,
                       child:
                     Column(
                       children: [
                     Container(
-                      height: MediaQuery.sizeOf(context).height*.25,
+                      height: MediaQuery.of(context).size.height*.25,
 
                       child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.dateAndTime,
@@ -326,7 +328,7 @@ class _DetailBodyState extends State<DetailBody> {
                           child: Text('Confirm appointment'),
                           onPressed: () => {
                             print("selectedDateselectedDateselectedDateselectedDate $selectedDate"),
-                            createAppointment(selectedDate, doctorId == null ? "" : doctorId),
+                            createAppointment(selectedDate, doctorId == null ? "" : doctorId, patientId),
                             Navigator.pop(context)
                           },
                         )

@@ -96,10 +96,13 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+
+    final String? patientId = ModalRoute.of(context)!.settings.arguments as String?;
     List<Widget> screens = [
       HomeTab(
         onPressedScheduleCard: goToSchedule,
-          doctorsList : userDataList
+          doctorsList : userDataList,
+        patientId: patientId
       ),
       ScheduleTab(),
     ];

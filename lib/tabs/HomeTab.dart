@@ -9,16 +9,17 @@ import 'package:medicare/Model/doctorlist.dart';
 class HomeTab extends StatelessWidget {
   final void Function() onPressedScheduleCard;
   final List<DoctorList> doctorsList;
+  final String? patientId;
   // final String userName;
   const HomeTab({
     Key? key,
     required this.onPressedScheduleCard,
     required this.doctorsList,
+    required this.patientId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("doctorsList $doctorsList");
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
@@ -82,12 +83,9 @@ class HomeTab extends StatelessWidget {
               TopDoctorCard(
                 img:'assets/doctor03.jpeg',
                 doctorName: doctor == null ? 'Name' : doctor.username.toString(),
-                doctorTitle:doctor == null ? 'Doctor' :doctor.email.toString(),
-                doctorId: doctor == null ? '' : doctor.id.toString(),
-
-                onTap: () {
-                  Navigator.pushNamed(context, '/detail', arguments: doctor.id.toString());
-                },
+                doctorTitle: doctor == null ? 'Doctor' :doctor.email.toString(),
+                doctorId: doctor == null ? 'Id' : doctor.id.toString(),
+                patientId: patientId
               )
           ],
         ),
@@ -100,15 +98,15 @@ class TopDoctorCard extends StatelessWidget {
   String img;
   String doctorName;
   String doctorTitle;
-  final VoidCallback onTap;
-  final String doctorId;
+  String doctorId;
+  String? patientId;
 
   TopDoctorCard({
     required this.img,
     required this.doctorName,
     required this.doctorTitle,
-    required this.onTap,
-    required this.doctorId
+    required this.doctorId,
+    required this.patientId,
   });
 
   @override
@@ -117,7 +115,7 @@ class TopDoctorCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/detail');
+          Navigator.pushNamed(context, '/detail', arguments: {'doctorId': doctorId.toString(), 'patientId': patientId.toString()});
         },
         child: Row(
           children: [

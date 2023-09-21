@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:medicare/screens/home.dart';
+// import 'package:hive/hive.dart';
 
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
@@ -177,7 +178,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
       if (response.statusCode == 200) {
         // If the cancellation is successful, update the local status
-        Navigator.push(context,MaterialPageRoute(builder: (context) =>Home()));
+
+        Map<String, dynamic> body = json.decode(response.body);
+        print("printing body ${body['token']} ");
+
+        Navigator.pushNamed(context, '/home', arguments: body['id']);
 
         print("Successfully logged In $response");
       } else {
