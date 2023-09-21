@@ -21,21 +21,6 @@ class _SliverDoctorDetailState extends State<SliverDoctorDetail> {
   DateTime selectedDate1 = DateTime.now();
 
   _selectDate()  {
-
-    // final DateTime? pickedDate = await
-    // showDatePicker(
-    //   context: context,
-    //   initialDate: DateTime.now(),
-    //   firstDate: DateTime.now(),
-    //   lastDate: DateTime(DateTime.now().year + 1),
-    //     keyboardType : TextInputType.datetime
-    // );
-
-    // if (pickedDate != null && pickedDate != selectedDate) {
-    //   setState(() {
-    //     selectedDate1 = newDate;
-    //   });
-    // }
   }
 
   Future<void> _selectTime() async {
@@ -56,7 +41,6 @@ class _SliverDoctorDetailState extends State<SliverDoctorDetail> {
       print("selectedDate $selectedDate");
       print("selectedTime $selectedTime");
     } else {
-      // Handle the case when date or time is not selected
       print('Date and time not selected.');
     }
   }
@@ -92,92 +76,7 @@ class _SliverDoctorDetailState extends State<SliverDoctorDetail> {
   }
 }
 
-// class DetailBody extends StatelessWidget {
-//   final VoidCallback selectDate;
-//   final VoidCallback selectTime;
-//   final VoidCallback bookAppointment;
-//   final DateTime selectedDate1;
-//
-//   const DetailBody({
-//     Key? key,
-//     required this.selectDate,
-//     required this.selectTime,
-//     required this.bookAppointment,
-//     required this.selectedDate1,
-//   }) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: EdgeInsets.all(20),
-//       margin: EdgeInsets.only(bottom: 30),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           DetailDoctorCard(),
-//           SizedBox(
-//             height: 15,
-//           ),
-//           DoctorInfo(),
-//           SizedBox(
-//             height: 30,
-//           ),
-//           Text(
-//             'About Doctor',
-//             style: kTitleStyle,
-//           ),
-//           SizedBox(
-//             height: 15,
-//           ),
-//           Text(
-//             'Dr. Joshua Simorangkir is a specialist in internal medicine who specialized blah blah.',
-//             style: TextStyle(
-//               color: Color(MyColors.purple01),
-//               fontWeight: FontWeight.w500,
-//               height: 1.5,
-//             ),
-//           ),
-//           SizedBox(
-//             height: 25,
-//           ),
-//           Text(
-//             'Location',
-//             style: kTitleStyle,
-//           ),
-//           SizedBox(
-//             height: 25,
-//           ),
-//           DoctorLocation(),
-//           SizedBox(
-//             height: 25,
-//           ),
-//           ElevatedButton(
-//             style: ButtonStyle(
-//               backgroundColor: MaterialStateProperty.all<Color>(
-//                 Color(MyColors.primary),
-//               ),
-//             ),
-//             child: Text('Book Appointment'),
-//             onPressed: ()  {
-//               print("Date is :"+selectedDate1.toString());
-//               CupertinoDatePicker(
-//                 mode: CupertinoDatePickerMode.dateAndTime,
-//                 initialDateTime: selectedDate1,
-//                 onDateTimeChanged: (DateTime newDate) async  {
-//                   selectedDate1;
-//                   //selectedDate1 = newDate;
-//                 },
-//               );
-//               // selectDate(); // Show date picker
-//               // selectTime(); // Show time picker
-//               // bookAppointment(); // Book the appointment
-//             },
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }
+
 
 class DetailBody extends StatefulWidget {
   final VoidCallback selectDate;
@@ -219,7 +118,7 @@ class _DetailBodyState extends State<DetailBody> {
         // Use the correct cancel endpoint
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
+          // 'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         },
         body: jsonEncode({
           "doctorId": doctorId,
@@ -274,7 +173,7 @@ class _DetailBodyState extends State<DetailBody> {
             height: 15,
           ),
           Text(
-            'Dr. Joshua Simorangkir is a specialist in internal medicine who specialized blah blah.',
+            'A specialist in internal medicine who specializes in heart surgery.',
             style: TextStyle(
               color: Color(MyColors.purple01),
               fontWeight: FontWeight.w500,
@@ -337,10 +236,6 @@ class _DetailBodyState extends State<DetailBody> {
                   );
                 },
               );
-
-              // if (newDate != null) {
-              //   _updateSelectedDate(newDate);
-              // }
             },
           )
         ],
@@ -478,7 +373,7 @@ class DetailDoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Dr. Josua Simorangkir',
+                      'Your Doctor',
                       style: TextStyle(
                           color: Color(MyColors.header01),
                           fontWeight: FontWeight.w700),
@@ -507,3 +402,5 @@ class DetailDoctorCard extends StatelessWidget {
     );
   }
 }
+
+

@@ -29,7 +29,9 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            UserIntro(),
+            UserIntro(
+              // patientId: patientId
+            ),
             // SizedBox(
             //   height: 10,
             // ),
@@ -217,13 +219,13 @@ class AppointmentCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dr.Muhammed Syahid',
+                            Text('Your Appointemnt',
                                 style: TextStyle(color: Colors.white)),
                             SizedBox(
                               height: 2,
                             ),
                             Text(
-                              'Dental Specialist',
+                              'With Dental Specialist',
                               style: TextStyle(color: Color(MyColors.text01)),
                             ),
                           ],
@@ -441,36 +443,6 @@ class SearchInput extends StatelessWidget {
   }
 }
 
-// class UserIntro extends StatelessWidget {
-//   const UserIntro({
-//     Key? key,
-//   }) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//       children: [
-//         Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: const [
-//             Text(
-//               'Hello',
-//               style: TextStyle(fontWeight: FontWeight.w500),
-//             ),
-//             Text(
-//               'Brad King 👋',
-//               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-//             ),
-//           ],
-//         ),
-//         const CircleAvatar(
-//           backgroundImage: AssetImage('assets/person.jpeg'),
-//         )
-//       ],
-//     );
-//   }
-// }
 
 class UserIntro extends StatefulWidget {
   const UserIntro({Key? key}) : super(key: key);
@@ -497,14 +469,14 @@ class _UserIntroState extends State<UserIntro> {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
+          // 'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
         },
       );
 
       if (response.statusCode == 200) {
         print(response.body);
         final userProfile = json.decode(response.body);
-        final userFullName = userProfile['username']; // Assuming the API response has a 'username' field
+        final userFullName = userProfile['username'];
         setState(() {
           userName = userFullName.toString();
         });
@@ -516,37 +488,6 @@ class _UserIntroState extends State<UserIntro> {
       print('Error: $error');
     }
   }
-
-  // Function to fetch user profile data
-/*
-  Future<void> fetchAllDoctors() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://localhost:8000/doctors'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        print(response.body);
-        setState(() {
-           userDataList = (json.decode(response.body))
-              .map((data) => {
-            "username": data["username"],
-            "email": data["email"],
-          })
-              .toList();
-        });
-      } else {
-        print('Failed to fetch user profile');
-      }
-    } catch (error) {
-      // Handle network errors or other exceptions...
-      print('Error: $error');
-    }
-  }
-*/
 
   @override
   Widget build(BuildContext context) {
@@ -560,10 +501,10 @@ class _UserIntroState extends State<UserIntro> {
               'Hello',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
-            Text(
-              '$userName 👋', // Display the fetched user name
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
+            // Text(
+            //   '$userName 👋',
+            //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            // ),
           ],
         ),
         const CircleAvatar(

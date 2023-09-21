@@ -26,35 +26,7 @@ class _HomeState extends State<Home> {
       _selectedIndex = 1;
     });
   }
-  // Function to fetch user profile data
-/*  Future<void> fetchUserProfile() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://localhost:8000/profile'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTAzZWE2ODAyNGI3MTI1NWVkNDY0MjAiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NDc1NTQ2MX0.TRAt-ahuebzpaeE33SWJuxahTX7o2Jk8oeKkqYtye_w"
-        },
-      );
 
-      if (response.statusCode == 200) {
-        print(response.body);
-        final userProfile = json.decode(response.body);
-        final userFullName = userProfile['username']; // Assuming the API response has a 'username' field
-        setState(() {
-          userName = userFullName.toString();
-        });
-      } else {
-        print('Failed to fetch user profile');
-      }
-    } catch (error) {
-      // Handle network errors or other exceptions...
-      print('Error: $error');
-    }
-  }*/
-
-  // Function to fetch user profile data
   Future<void> fetchAllDoctors() async {
     try {
       final response = await http.get(
@@ -82,16 +54,13 @@ class _HomeState extends State<Home> {
         print('Failed to fetch user profile');
       }
     } catch (error) {
-      // Handle network errors or other exceptions...
       print('Error: $error');
     }
   }
   @override
   void initState() {
     super.initState();
-    // fetchUserProfile();
     fetchAllDoctors();
-    // fetchUserDetails();
   }
 
   @override

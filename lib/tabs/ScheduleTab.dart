@@ -52,7 +52,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
         await http.get(Uri.parse('http://localhost:8000/appointment/get'), headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
+          // 'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         });
 
     if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
         // Use the correct cancel endpoint
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
+          // 'x-auth-token': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA5NGVkNjkxYjA0N2VkYzgwZTBmNjciLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTY5NTE3MzI4NH0.exwFyhCYpaWPhNw6GeNeAG8TOvEZEtwnPX8tyUW9hto"
         },
         body: jsonEncode({'status': 'Canceled'}), // Send the updated status
       );
@@ -250,7 +250,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                             children: [
                               CircleAvatar(
                                 backgroundImage: AssetImage(
-                                    'assets/doctor.jpg'), // Replace with your default image
+                                    'assets/doctor02.png'),
                               ),
                               SizedBox(
                                 width: 10,
@@ -433,52 +433,6 @@ class DateTimeCard extends StatelessWidget {
       ),
     );
   }
-
-  // Widget build(BuildContext context) {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       color: Color(MyColors.bg01),
-  //       borderRadius: BorderRadius.circular(10),
-  //     ),
-  //     width: double.infinity,
-  //     padding: EdgeInsets.all(20),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       children: const [
-  //         Icon(
-  //           Icons.calendar_today,
-  //           color: Colors.white,
-  //           size: 17,
-  //         ),
-  //         SizedBox(
-  //           width: 5,
-  //         ),
-  //         Text(
-  //           'Mon, July 29',
-  //           style: TextStyle(color: Colors.white),
-  //         ),
-  //         SizedBox(
-  //           width: 20,
-  //         ),
-  //         Icon(
-  //           Icons.access_alarm,
-  //           color: Colors.white,
-  //           size: 17,
-  //         ),
-  //         SizedBox(
-  //           width: 5,
-  //         ),
-  //         Flexible(
-  //           child: Text(
-  //             date,
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
 }
 
 
